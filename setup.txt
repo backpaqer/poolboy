@@ -1,0 +1,263 @@
+# poolboy
+ Pool automation for Raspberry Pi
+
+# Setup - On Windows/Mac
+# Install Raspbian lite (32-bit) using Raspberry Pi Imager (v1.7.2)
+
+# Install card into Raspberry Pi, connect monitor/keyboard, power up
+# Create user/password
+
+sudo raspi-config 
+# Open Config, Enable SSH, I2C, 1-wire
+# Connect to network as required
+# reboot
+
+# installs required:
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt-get install nginx
+sudo apt-get install apache2-utils
+sudo apt-get install mariadb-server
+sudo mysql_secure_installation
+* no to password (so...enter for root password, "no" to next 2 questions)
+* yes to everything else.
+
+sudo apt-get install php-fpm php-mysql
+sudo nano /etc/php/7.4/fpm/php.ini
+* find cgi.fix_pathinfo=1 and change it to 0
+
+sudo systemctl restart php7.4-fpm
+
+#---------------SETUP POOLBOY USERS------------------------
+# Create password file
+sudo htpasswd -c /etc/nginx/.htpasswd {username}
+# sudo htpasswd /etc/nginx/.htpasswd more-users (adds a user called "more-users")
+# just leave off the "-c" for extra users
+# use -D to delete users
+# sudo cat /etc/nginx/.htpasswd (lists all the current active users).
+
+sudo nano /etc/nginx/sites-available/default
+**Looks like this...
+server {
+    listen 8080 default_server;                         ##### or whatever port you want to listen on.
+    listen [::]:8080 default_server;
+
+    root /var/www/html;
+    index index.php index.html index.htm index.nginx-debian.html;
+
+    server_name _; 
+
+    location / {
+        try_files $uri $uri/ =404;
+	auth_basic "Restricted Content";
+	auth_basic_user_file /etc/nginx/.htpasswd;
+    }
+
+    location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/var/run/php7.3-fpm.sock;
+    }
+
+    location ~ /\.ht {
+        deny all;
+    }
+}
+---------------------------------------------
+sudo nginx -t
+sudo systemctl reload nginx
+
+----------------------------------------------
+CREATE STATIC IP
+Assuming wifi connection...
+
+#check dhcpcd running
+sudo service dhcpcd status
+
+#if it's not active...
+sudo service dhcpcd start
+sudo systemctl enable dhcpcd
+
+sudo nano /etc/dhcpcd.conf
+
+#add following to bottom of file...maybe some tweaking required if 192.168.1 etc..or if using eth0
+interface eth0
+static ip_address=192.168.0.whatever you like./24 (I use 81)
+static routers=192.168.0.1
+static domain_name_servers=192.168.0.1
+
+#add following to bottom of file...maybe some tweaking required if 192.168.1 etc..or if using eth0
+#though using a wlan0 connection requires that you establish credentials to login
+
+interface wlan0
+static ip_address=192.168.0.whatever you like./24 (I use 82)
+static routers=192.168.0.1
+static domain_name_servers=192.168.0.1
+
+#cross fingers and...
+sudo reboot
+
+# This should be the end of the base configuration 
+
+---------------------------------------------------------------------
+------------POOLBOY SYSTEM SETUP ------------------------------------
+---------------------------------------------------------------------
+# choose your own internal username/password for the database and make a note
+# of it as you'll be using this a fair bit.
+
+servername = "localhost"
+username = "{username}"
+password = "{userpass}"
+dbname = "poolboy"
+
+** create database objects.
+sudo mysql -u root
+
+# note...you need to use the quotes (') in the next line
+grant all privileges on *.* to '{username}'@'localhost' identified by '{userpass}';
+
+\q (quit and login)
+sudo mysql -u {username} -p 
+(enter {password})
+create database poolboy;
+use poolboy;
+\q (quit to cmd again)
+
+----------------------------------------------------------------
+use WinSCP to copy Poolboy objects to server.
+----------------------------------------------------------------
+cd /home/pi/PoolBoy/database
+chmod +x db_scripts
+./db_scripts
+
+# any issues - install dos2unix "sudo apt install -y dos2unix"
+# and convert all the windows files into unix format and try again.
+
+(runs all the following commands)-------------------------------
+sudo mysql -u root poolboy < table_ComboFlow.sql
+sudo mysql -u root poolboy < table_ComboItem.sql
+sudo mysql -u root poolboy < table_ComboMain.sql
+sudo mysql -u root poolboy < table_EventLog.sql
+sudo mysql -u root poolboy < table_MainTimer.sql
+sudo mysql -u root poolboy < table_MainTimerAudit.sql
+sudo mysql -u root poolboy < table_Relays.sql
+sudo mysql -u root poolboy < table_Sensors.sql
+sudo mysql -u root poolboy < table_Temperatures.sql
+sudo mysql -u root poolboy < trig_MainTimer.sql
+sudo mysql -u root poolboy < view_ActiveRelays.sql
+sudo mysql -u root poolboy < view_ActiveSchedules.sql
+sudo mysql -u root poolboy < view_NextTimer.sql
+sudo mysql -u root poolboy < view_TodaysTemps.sql
+sudo mysql -u root poolboy < proc_clearOverride.sql
+sudo mysql -u root poolboy < proc_loadOverride.sql
+sudo mysql -u root poolboy < proc_clearNormal.sql
+sudo mysql -u root poolboy < proc_loadNormal.sql
+sudo mysql -u root poolboy < proc_writeLog.sql
+sudo mysql -u root poolboy < proc_writeTemperature.sql
+sudo mysql -u root poolboy < data_silenceload.sql
+---------------------------------------------
+(optional: sudo chown -R root:pi /var/www/html)
+
+*copy web files into /var/www/html
+cd /home/pi/PoolBoy
+chmod +x refreshweb.sh
+sudo ./refreshweb.sh
+cd /var/www/html
+sudo rm index.nginx*
+
+sudo apt install python3-pip
+sudo pip3 install cymysql
+
+-------------------------------------------
+# install serial 
+sudo python -m pip install pyserial
+
+----------------------------------------------
+DYN DNS using DuckDNS
+www.duckdns.org
+login to create account.
+register a sub domain name 
+account: xxxxxxxxxxxxxxxxxxxxxx
+type: free
+token: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+lists current IP as created.
+
+# all starts from poolboy home.
+cd /home/pi/PoolBoy
+
+ps -ef | grep cr[o]n
+# if this returns nothing - then go and read up how to install cron for your distribution of linux.
+# also confirm that you have curl installed, test this by attempting to run curl
+
+curl
+# if this returns a command not found like error - then find out how to install curl for your distribution.
+# otherwise lets get started and make a directory to put your files in, move into it and make our main script
+
+mkdir duckdns
+cd duckdns
+nano duck.sh
+# now copy this text and put it into the file (in vi you hit the i key to insert, ESC then u to undo) you must # change your token and domain to be the one you want to update
+# you can pass a comma separated (no spaces) list of domains
+# you can if you need to hard code an IP (best not to - leave it blank and we detect your remote ip)
+# hit ESC then use use arrow keys to move the cursor x deletes, i puts you back into insert mode
+echo url="https://www.duckdns.org/update?domains={your domain}&token={your token}&ip=" | curl -k -o ~/duckdns/duck.log -K -
+
+# now save the file (in nano Ctrl+X, Y to save)
+# this script will make a https request and log the output in the file duck.log
+# now make the duck.sh file executeable
+chmod 700 duck.sh
+
+# next we will be using the cron process to make the script get run every 5 minutes
+crontab -e
+
+# copy this text and paste it at the bottom of the crontab
+*/5 * * * * ~/duckdns/duck.sh >/dev/null 2>&1
+
+# now save the file (CTRL+X)
+# lets test the script
+./duck.sh
+
+# this should simply return to a prompt
+# we can also see if the last attempt was successful (OK or bad KO)
+cat duck.log
+
+# if it is KO check your Token and Domain are correct in the duck.sh script
+
+
+--------------------------------------------
+TEST FIRE
+--------------------------------------------
+sudo python dataRelay.py
+* should fire up all the relays (might have turned this test function off now).
+* Ctrl+C to quit
+
+================================ not used if not creating a service
+cd /etc/init.d
+sudo cp /home/pi/PoolBoy/service/poolboy.sh /etc/init.d
+(need to make sure that file format is UNIX..check via nano use ALT+D to change)
+
+sudo chmod 755 poolboy.sh
+================================ end service
+# created new script poollaunch.sh
+sudo chmod 755 poollaunch.sh
+cd
+cd PoolBoy
+mkdir logs
+sudo crontab -e
+# add following line to bottom.
+@reboot sleep 30 && sh /home/pi/PoolBoy/service/poollaunch.sh >/home/pi/PoolBoy/logs/cronlog 2>&1
+sudo reboot
+
+---------------------------------------------
+temp probes.
+if these are working, they should show up in /sys/bus/w1/devices
+they should have names like 28-123123xx12xx
+running the python code will automatically populate.
+---------------------------------------------
+
+key directories:
+- /var/www/html (web pages)
+- /home/pi/PoolBoy/python (python code)
+
+
+
+
