@@ -1,0 +1,264 @@
+body {
+    color: white;
+    text-decoration: none;
+    font: 400 13.3333px Arial;
+}
+
+input[type=text] {
+    padding: 15px 22px;
+    margin: 10px 5px;
+    box-sizing: border-box; 
+    border-radius: 12px;
+}
+
+.cooldown {
+    display: block;
+    position: absolute;
+    top: 17px;
+    left: 20px;
+    z-index: 2;
+}
+
+.chart-container {
+	width:  80%;
+	height: 360px;
+	margin: 0 auto;
+}
+
+.backvideo {
+    position: fixed;
+    z-index: -1;
+    right: 0;
+    bottom: 0;
+    min-width: 100%;
+    min-height: 100%;
+}
+
+ .button {
+     background-color: white;
+     border-color: #4CAF50;
+     border-width: 2px;
+     width: 120px;
+     color: #4CAF50;
+     padding: 20px;
+     text-align: center;
+     text-decoration: none;
+     display: inline-block;
+     font-size: 16px;
+     margin: 4px 2px;
+     cursor: pointer;
+ }
+
+.hbutton {
+    background-color: white;
+    border-color: #4CAF50;
+    border-width: 2px;
+    width: 120px;
+    height: 60px; 
+    color: #4CAF50;
+    padding: 0px;
+    text-align: center;
+    vertical-align: text-top;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+}
+
+.poolbutton {
+    background-color: rgb(75, 197, 253);
+    border-color: rgb(75, 197, 253);
+    border-width: 2px;
+    width: 100%;
+    height: 40px; 
+    color: white;
+    padding: 0px;
+    text-align: center;
+    vertical-align: text-top;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 32px;
+    margin: 4px 0px;
+    cursor: pointer;
+}
+
+.listbutton {
+    background-color: white;
+    border-color: #4CAF50;
+    border-width: 2px;
+    width: 100px;
+    height: 60px; 
+    color: #4CAF50;
+    padding: 0px;
+    text-align: center;
+    vertical-align: text-top;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 0px 0px;
+    cursor: pointer;
+}
+
+.daybutton {
+    background-color: white;
+    border-color: #4CAF50;
+    border-width: 2px;
+    width: 60px;
+    height: 60px; 
+    color: #4CAF50;
+    padding: 0px;
+    text-align: center;
+    vertical-align: text-top;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 0px 0px;
+    cursor: pointer;
+}
+
+.deletebutton {
+    background-color: #4CAF50;
+    border-color: #4CAF50;
+    border-width: 2px;
+    width: 80px;
+    height: 60px; 
+    color: white;
+    padding: 0px;
+    text-align: center;
+    vertical-align: text-top;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 0px 0px;
+    cursor: pointer;
+}
+
+.relaybuttonOFF {
+    background-color: white;
+    border-color: #4CAF50;
+    border-width: 2px;
+    width: 120px;
+    height: 40px;
+    color: #4CAF50;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+}
+
+.relaybuttonON {
+    background-color: #4CAF50;
+    border-color: #4CAF50;
+    border-width: 2px;
+    width: 120px;
+    height: 40px; 
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+}
+
+.relaybuttonUNUSED {
+    background-color: grey;
+    border-color: #4CAF50;
+    border-width: 2px;
+    width: 120px;
+    height: 40px; 
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+}
+
+.buttonnarrow {
+    background-color: white;
+    border-color: #4CAF50;
+    border-width: 2px;
+    width: 50px;
+    height: 120px;
+    color: #4CAF50;
+    padding: 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+}
+
+.buttonwide {
+    background-color: white;
+    border-color: #4CAF50;
+    border-width: 2px;
+    width: 160px;
+    color: #4CAF50;
+    padding: 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+}
+
+.activebutton {
+     background-color: #4CAF50;
+     border-color: #4CAF50;
+     border-width: 2px;
+     width: 120px;
+     color: white;
+     padding: 20px;
+     text-align: center;
+     text-decoration: none;
+     display: inline-block;
+     font-size: 16px;
+     margin: 4px 2px;
+     cursor: pointer;
+ }
+
+ .invertbutton {
+    background-color: #e20909;
+    border-color: #4CAF50;
+    border-width: 2px;
+    width: 120px;
+    color: white;
+    padding: 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+}
+
+.button12 {border-radius: 12px;}
+
+div.fixed {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
+div.transbox {
+    margin: 30px;
+    background-color: #ffffff;
+    border: 1px solid black;
+    opacity: 0.6;
+    filter: alpha(opacity=60); /* For IE8 and earlier */
+}
+
+div.transbox p {
+    margin: 5%;
+    font-weight: bold;
+    color: #000000;
+}
+
