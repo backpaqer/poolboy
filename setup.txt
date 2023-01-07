@@ -103,9 +103,13 @@ sudo reboot
 ---------------------------------------------------------------------
 # choose your own internal username/password for the database and make a note
 # of it as you'll be using this a fair bit.
+# note that you will also need to update the username/password values in a few files
+# namely:
+# - website/php/config.php
+# - python/dataRelay.py
 
 servername = "localhost"
-username = "{username}"
+username = "{username}" 
 password = "{userpass}"
 dbname = "poolboy"
 
