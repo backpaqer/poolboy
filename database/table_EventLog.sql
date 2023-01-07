@@ -1,0 +1,13 @@
+use poolboy;
+DELIMITER //
+
+DROP TABLE IF EXISTS EventLog //
+
+CREATE TABLE EventLog (
+  ID            INT NOT NULL AUTO_INCREMENT,
+  LogTime       TIME NOT NULL,
+  LogText       VARCHAR(255) NOT NULL,
+  PRIMARY KEY   (ID)
+)//
+
+DELIMITER ;
